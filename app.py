@@ -426,7 +426,7 @@
 
 #实现密码功能
 
-import imp
+
 from flask import request, url_for, redirect, flash
 from flask import Flask, render_template
 import os, sys, click
@@ -453,6 +453,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # 关闭对模型修改的�
 app.config['SECRET_KEY']='dev'
 # 在扩展类实例化前加载配置
 db = SQLAlchemy(app)
+login_manager = LoginManager(app) # 实例化扩展类
+login_manager.login_view = 'login'
 
 
 class User(db.Model, UserMixin): # 表名将会是 user（自动生成，小写处理）
@@ -576,8 +578,7 @@ def admin(username, password):
     db.session.commit() # 提交数据库会话
     click.echo('Done.')
 
-login_manager = LoginManager(app) # 实例化扩展类
-login_manager.login_view = 'login'
+
 
 @login_manager.user_loader
 def load_user(user_id): # 创建用户加载回调函数，接受用户 ID 作为参数
@@ -629,4 +630,8 @@ def settings():
         flash('Settings updated.')
         return redirect(url_for('index'))
     return render_template('settings.html')
+
+
+
+
 
